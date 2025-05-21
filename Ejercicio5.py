@@ -24,15 +24,16 @@ class LinkedList:
             current.next = new_node  # Enlaza el nuevo nodo al final
 
     def buscar(self, valor):
-        # Busca un valor en la lista y retorna su posición (o -1 si no está)
+        # Busca todas las posiciones donde aparece el valor en la lista
+        posiciones = []
         current = self.head
         index = 0
         while current:
             if current.data == valor:
-                return index       # Retorna la posición si lo encuentra
+                posiciones.append(index)
             current = current.next
             index += 1
-        return -1                 # Retorna -1 si no lo encuentra
+        return posiciones
 
     def mostrar_lista(self):
         # Devuelve un string con todos los valores de la lista enlazada
@@ -61,6 +62,15 @@ class LinkedList:
     def vaciar(self):
         # Elimina todos los nodos de la lista
         self.head = None
+
+# ---------------------- FUNCIÓN AUXILIAR PARA VALIDAR ENTEROS ----------------------
+def es_entero(valor):
+    """Devuelve True si el valor es un número entero (positivo o negativo)."""
+    try:
+        int(valor)
+        return True
+    except ValueError:
+        return False
 
 # ---------------------- INTERFAZ GRÁFICA CON TKINTER ----------------------
 class App:
@@ -127,9 +137,9 @@ class App:
     # ---------------------- FUNCIONES DE LOS BOTONES ----------------------
 
     def agregar(self):
-        # Agrega el valor ingresado a la lista si es un número entero
+        # Agrega el valor ingresado a la lista si es un número entero (positivo o negativo)
         valor = self.entry_valor.get()
-        if valor.strip().isdigit():
+        if es_entero(valor.strip()):
             self.lista.append(int(valor.strip()))
             self.entry_valor.delete(0, tk.END)
             self.actualizar_lista()
@@ -137,12 +147,16 @@ class App:
             messagebox.showwarning("Error", "Por favor, ingresa un número entero válido.")
 
     def buscar(self):
-        # Busca el valor ingresado en la lista y muestra la posición si existe
+        # Busca el valor ingresado en la lista y muestra todas las posiciones si existe
         valor = self.entry_valor.get()
-        if valor.strip().isdigit():
-            posicion = self.lista.buscar(int(valor.strip()))
-            if posicion != -1:
-                messagebox.showinfo("Encontrado", f"El valor {valor} se encuentra en la posición {posicion}.")
+        if es_entero(valor.strip()):
+            posiciones = self.lista.buscar(int(valor.strip()))
+            if posiciones:
+                if len(posiciones) == 1:
+                    messagebox.showinfo("Encontrado", f"El valor {valor} se encuentra en la posición {posiciones[0]}.")
+                else:
+                    pos_str = ', '.join(str(p) for p in posiciones)
+                    messagebox.showinfo("Repetido", f"El valor {valor} se repite en las posiciones: {pos_str}.")
             else:
                 messagebox.showinfo("No encontrado", f"El valor {valor} no está en la lista.")
         else:
@@ -151,7 +165,7 @@ class App:
     def eliminar(self):
         # Elimina el valor ingresado de la lista si existe
         valor = self.entry_valor.get()
-        if valor.strip().isdigit():
+        if es_entero(valor.strip()):
             eliminado = self.lista.eliminar(int(valor.strip()))
             if eliminado:
                 messagebox.showinfo("Éxito", f"Se eliminó el valor {valor}.")
