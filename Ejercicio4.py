@@ -14,37 +14,40 @@ import heapq  # Proporciona una estructura de datos tipo heap para implementar l
 
 class ColaPrioridad:
     def __init__(self):
-        self.cola = []  # Cola principal: almacena tuplas (prioridad, nombre)
-        self.historial = []  # Guarda los elementos desencolados
+        self.cola = []      # Lista principal que almacena tuplas (prioridad, nombre) como heap
+        self.historial = [] # Lista para guardar los elementos que han sido desencolados
 
     def encolar(self, nombre, prioridad):
-        heapq.heappush(self.cola, (prioridad, nombre))  # Inserta elemento según prioridad
+        heapq.heappush(self.cola, (prioridad, nombre))  # Inserta el elemento en el heap según prioridad
 
     def desencolar(self):
         if self.cola:
-            elemento = heapq.heappop(self.cola)  # Extrae el de mayor prioridad
-            self.historial.append(elemento)
+            elemento = heapq.heappop(self.cola)  # Extrae el elemento con mayor prioridad (menor número)
+            self.historial.append(elemento)       # Lo agrega al historial de desencolados
             return elemento
         return None
 
     def buscar(self, nombre):
+        # Busca un elemento por nombre (ignorando mayúsculas/minúsculas)
         for i, (p, n) in enumerate(self.cola):
             if n.lower() == nombre.lower():
-                return (i + 1, p)  # Devuelve posición y prioridad
+                return (i + 1, p)  # Devuelve la posición (empezando en 1) y la prioridad
         return None
 
     def editar(self, nombre, nueva_prioridad):
+        # Busca el elemento y cambia su prioridad
         for i, (p, n) in enumerate(self.cola):
             if n.lower() == nombre.lower():
-                self.cola[i] = (nueva_prioridad, n)
-                heapq.heapify(self.cola)  # Reorganiza el heap después del cambio
+                self.cola[i] = (nueva_prioridad, n)  # Cambia la prioridad
+                heapq.heapify(self.cola)             # Reorganiza el heap para mantener la propiedad
                 return True
         return False
 
     def vaciar(self):
-        self.cola.clear()
+        self.cola.clear()  # Elimina todos los elementos de la cola
 
     def obtener_estadisticas(self):
+        # Calcula estadísticas: total de elementos, menor prioridad, promedio de prioridades
         if not self.cola:
             return (0, "N/A", "N/A")
         prioridades = [p for p, _ in self.cola]
@@ -58,22 +61,21 @@ class InterfazColaPrioridad:
     def __init__(self, root):
         self.root = root
         self.root.title("🧺 Cola de Prioridad - Interfaz Estética")
-        self.root.configure(bg="#fff5e6")  # Fondo cálido: beige claro
+        self.root.configure(bg="#fff5e6")  # Fondo cálido
 
-        self.cola = ColaPrioridad()
+        self.cola = ColaPrioridad()        # Instancia de la lógica de la cola
 
-        # Fuente base
-        fuente = ("Segoe UI", 10)
+        fuente = ("Segoe UI", 10)          # Fuente base para los widgets
 
         # Título principal
         titulo = tk.Label(root, text="Cola de Prioridad", font=("Segoe UI", 18, "bold"), fg="#cc6600", bg="#fff5e6")
         titulo.pack(pady=(10, 5))
 
-        # Marco contenedor
+        # Frame para agrupar los widgets
         frame = tk.Frame(root, bg="#fff5e6")
         frame.pack(padx=20, pady=10)
 
-        # Etiquetas y entradas
+        # Entradas para nombre y prioridad
         tk.Label(frame, text="Nombre:", font=fuente, bg="#fff5e6").grid(row=0, column=0, sticky="e", padx=5, pady=5)
         self.nombre_entry = tk.Entry(frame, width=30, font=fuente, bg="#fffaf0")
         self.nombre_entry.grid(row=0, column=1, padx=5, pady=5)
@@ -82,7 +84,7 @@ class InterfazColaPrioridad:
         self.prioridad_entry = tk.Entry(frame, width=30, font=fuente, bg="#fffaf0")
         self.prioridad_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        # Botones de acción
+        # Botones de acción con sus funciones
         botones = [
             ("➕ Encolar", self.encolar),
             ("➖ Desencolar", self.desencolar),
@@ -90,14 +92,13 @@ class InterfazColaPrioridad:
             ("✏️ Editar Prioridad", self.editar),
             ("🗑 Vaciar Cola", self.vaciar_cola),
         ]
-
         for i, (texto, comando) in enumerate(botones):
             boton = tk.Button(frame, text=texto, command=comando,
                               font=fuente, width=25, bg="#ffd9b3", fg="#663300",
                               activebackground="#ffcc99", relief="raised", bd=2)
             boton.grid(row=2+i, column=0, columnspan=2, pady=4)
 
-        # Lista de elementos
+        # Lista visual de elementos en la cola
         tk.Label(frame, text="📋 Elementos en la cola:", font=fuente, bg="#fff5e6").grid(row=7, column=0, columnspan=2, pady=(10, 2))
         self.lista = tk.Listbox(frame, width=45, height=6, font=("Consolas", 10), bg="#fffaf0")
         self.lista.grid(row=8, column=0, columnspan=2, pady=4)
