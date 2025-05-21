@@ -1,66 +1,80 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-# Función para verificar paréntesis balanceados y detectar errores
+# ---------------------- FUNCIÓN PARA VERIFICAR PARÉNTESIS ----------------------
+
 def verificar_balanceo_detallado(cadena):
     """
     Verifica si los paréntesis (), {}, [] están balanceados en la cadena.
     Si hay un error, indica el tipo de paréntesis y la posición exacta (empezando en 1).
     Devuelve: (balanceado: bool, mensaje: str, resumen: dict)
     """
-    pila = []
-    pares = {')': '(', '}': '{', ']': '['}
-    resumen = {'(': 0, ')': 0, '{': 0, '}': 0, '[': 0, ']': 0}
+    pila = []  # Lista que funcionará como pila para guardar los paréntesis de apertura y su posición
+    pares = {')': '(', '}': '{', ']': '['}  # Diccionario que indica qué apertura corresponde a cada cierre
+    resumen = {'(': 0, ')': 0, '{': 0, '}': 0, '[': 0, ']': 0}  # Diccionario para contar cada tipo de paréntesis
 
+    # Recorre cada carácter de la cadena junto con su índice
     for i, char in enumerate(cadena):
+        # Si el carácter es un paréntesis de apertura
         if char in '({[':
-            pila.append((char, i))
-            resumen[char] += 1
+            pila.append((char, i))    # Guarda el tipo de paréntesis y su posición en la pila
+            resumen[char] += 1        # Suma uno al contador de ese tipo de apertura
+        # Si el carácter es un paréntesis de cierre
         elif char in ')}]':
-            resumen[char] += 1
+            resumen[char] += 1        # Suma uno al contador de ese tipo de cierre
             if not pila:
-                # No hay apertura correspondiente
+                # Si la pila está vacía, significa que hay un cierre sin apertura previa
                 return False, f"Error: paréntesis de cierre '{char}' sin apertura en posición {i+1}.", resumen
-            ultimo, pos_ultimo = pila[-1]
+            ultimo, pos_ultimo = pila[-1]  # Obtiene el último paréntesis de apertura pendiente y su posición
             if ultimo != pares[char]:
-                # Paréntesis de cierre no coincide con el de apertura
+                # Si el tipo de apertura no coincide con el cierre, hay un error de correspondencia
                 return False, (
                     f"Error: paréntesis de cierre '{char}' en posición {i+1} no coincide con "
                     f"el de apertura '{ultimo}' en posición {pos_ultimo+1}."
                 ), resumen
-            pila.pop()
+            pila.pop()  # Si coincide, elimina ese paréntesis de apertura de la pila
 
+    # Si al final quedan aperturas sin cerrar en la pila
     if pila:
-        # Hay paréntesis de apertura sin cerrar
-        char, pos = pila[-1]
+        char, pos = pila[-1]  # Toma el primer paréntesis de apertura sin cerrar y su posición
         return False, f"Error: paréntesis de apertura '{char}' sin cerrar en posición {pos+1}.", resumen
 
+    # Si no hubo errores, retorna que está balanceado
     return True, "✅ Paréntesis balanceados correctamente.", resumen
 
-# Sugerencia de corrección automática de paréntesis
+# ---------------------- FUNCIÓN PARA CORREGIR PARÉNTESIS AUTOMÁTICAMENTE ----------------------
+
 def corregir_parentesis(cadena):
-    pila = []
-    resultado = []
-    pares = {')': '(', '}': '{', ']': '['}
-    apertura = {'(': ')', '{': '}', '[': ']'}
-    # Recorre la cadena y construye el resultado corrigiendo sobre la marcha
+    """
+    Corrige la cadena agregando los paréntesis de cierre faltantes al final
+    y eliminando los de cierre que no tienen apertura correspondiente.
+    Devuelve la cadena corregida y balanceada.
+    """
+    pila = []       # Pila para guardar los paréntesis de apertura pendientes
+    resultado = []  # Lista para construir la cadena corregida
+    pares = {')': '(', '}': '{', ']': '['}      # Diccionario de cierre -> apertura
+    apertura = {'(': ')', '{': '}', '[': ']'}   # Diccionario de apertura -> cierre
+
+    # Recorre cada carácter de la cadena
     for char in cadena:
         if char in '({[':
-            pila.append(char)
-            resultado.append(char)
+            pila.append(char)        # Guarda la apertura en la pila
+            resultado.append(char)   # Añade la apertura al resultado
         elif char in ')}]':
+            # Si hay una apertura correspondiente en la pila y coincide con el cierre actual
             if pila and pila[-1] == pares[char]:
-                pila.pop()
-                resultado.append(char)
+                pila.pop()           # Elimina la apertura de la pila
+                resultado.append(char)  # Añade el cierre al resultado
             else:
-                # Si hay un cierre sin apertura, lo ignoramos (lo quitamos)
+                # Si hay un cierre sin apertura, lo ignora (no lo añade al resultado)
                 continue
         else:
-            resultado.append(char)
-    # Al final, agregamos los cierres faltantes
+            resultado.append(char)   # Si no es paréntesis, lo añade al resultado
+
+    # Al final, agrega los cierres faltantes para cada apertura que quedó pendiente
     while pila:
         resultado.append(apertura[pila.pop()])
-    return ''.join(resultado)
+    return ''.join(resultado)  # Devuelve la cadena corregida y balanceada
 
 # ---------------------- INTERFAZ GRÁFICA ----------------------
 

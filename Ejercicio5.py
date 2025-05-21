@@ -1,4 +1,3 @@
-# Importamos las librerías necesarias
 import tkinter as tk
 from tkinter import messagebox
 
@@ -118,21 +117,15 @@ class App:
             btn.bind("<Leave>", lambda e, b=btn: b.config(bg=color_boton if b != self.btn_limpiar else "#c62828"))
 
     def agregar(self):
-        """
-        Obtiene el valor del campo de entrada y lo agrega a la lista si es válido.
-        """
         valor = self.entry_valor.get()
         if valor.strip().isdigit():
             self.lista.append(int(valor.strip()))
-            self.entry_valor.delete(0, tk.END)  # Limpia la entrada
-            self.actualizar_lista()  # Muestra la lista actualizada
+            self.entry_valor.delete(0, tk.END)
+            self.actualizar_lista()
         else:
             messagebox.showwarning("Error", "Por favor, ingresa un número entero válido.")
 
     def buscar(self):
-        """
-        Busca el valor en la lista y muestra la posición si existe.
-        """
         valor = self.entry_valor.get()
         if valor.strip().isdigit():
             posicion = self.lista.buscar(int(valor.strip()))
@@ -144,9 +137,6 @@ class App:
             messagebox.showwarning("Entrada inválida", "Por favor, ingresa un número entero.")
 
     def eliminar(self):
-        """
-        Elimina el valor de la lista si existe.
-        """
         valor = self.entry_valor.get()
         if valor.strip().isdigit():
             eliminado = self.lista.eliminar(int(valor.strip()))
@@ -160,16 +150,10 @@ class App:
             messagebox.showwarning("Entrada inválida", "Por favor, ingresa un número entero.")
 
     def vaciar(self):
-        """
-        Limpia toda la lista.
-        """
         self.lista.vaciar()
         self.actualizar_lista()
 
     def actualizar_lista(self):
-        """
-        Actualiza el texto mostrado con el contenido actual de la lista enlazada.
-        """
         texto = "Lista actual: " + self.lista.mostrar_lista()
         self.lbl_lista.config(text=texto)
 
